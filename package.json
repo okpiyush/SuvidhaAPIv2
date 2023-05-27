@@ -1,0 +1,27 @@
+{
+  "name": "ecommerceAPI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cloudinary": "^1.37.0",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.1.1",
+    "node-fetch": "^2.6.11",
+    "nodemailer": "^6.9.2",
+    "nodemon": "^2.0.22",
+    "stripe": "^12.5.0"
+  }
+}
