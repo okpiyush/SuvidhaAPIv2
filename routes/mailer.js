@@ -117,7 +117,7 @@ router.post("/bulkmail",verifyTokenAndAdmin,async(req,res)=>{
 
 
 //getting all mails
-router.get("/getmails",async (req,res)=>{
+router.get("/getmails",verifyTokenAndAdmin,async (req,res)=>{
     const emails=await Mail.find();
     res.send(emails);
 });
@@ -134,7 +134,48 @@ router.delete("/delete/:id",async(req,res)=>{
 });
 
 
+//sending mail to a specific email address
+router.post("/sendmail",verifyTokenAndAdmin,async (req,res)=>{
+  const {email,name,desig,subject,body}=req.body;
+  console.log(email,name,desig,subject,body);
 
+  //attach transformaer and mail optons 
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.email,
+      pass: process.env.epassword
+    }
+  });
+  var MailOptions = {
+    from: process.env.email,
+    to: email,
+    bcc:process.env.email,
+    subject:subject,
+    html:`
+      <div> Dear ${email},</div>
+      <p>${body}</p>
+      <p>Thank you for your attention.</p>
+      <p style="color:red">Please note that this is an automated email and we kindly request that you do not respond directly to this message.</p>
+      <div>${name},</div>
+      <div>${desig},</div>
+      <div>The Suvidha Team</div>
+    `
+  };
+  try {
+    transporter.sendMail(MailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: '
+         + info.response);
+      }
+    });
+    res.send(email);
+  }catch (err) {
+  console.log(err);
+  }
+})
 
 
 module.exports = router;

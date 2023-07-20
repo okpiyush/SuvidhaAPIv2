@@ -17,10 +17,6 @@ router.post("/userposttest",(req,res)=>{
 
 
 
-
-
-
-
 //update user and it's password
 router.put("/:id",verifyTokenAndAuthorization,async (req,res)=>{
     
@@ -46,6 +42,10 @@ router.put("/:id",verifyTokenAndAuthorization,async (req,res)=>{
 });
 
 
+
+
+
+
 //delete user
 router.delete("/:id",verifyTokenAndAuthorization,async(req,res)=>{
     try{
@@ -55,6 +55,10 @@ router.delete("/:id",verifyTokenAndAuthorization,async(req,res)=>{
         res.status(500).json(err);
     }
 })
+
+
+
+
 
 
 //get user 
@@ -85,44 +89,33 @@ router.get("/",verifyTokenAndAdmin,async(req,res)=>{
 //get user stats 
 
 
-router.get("/stats",verifyTokenAndAdmin,async(req,res)=>{
-    const date=new Date();
-    const lastYear=new Date(date.setFullYear(date.getFullYear()-1));
-    try{
-        const data=await User.aggregate([
-            {
-                $match:
-                {
-                    createdAt: 
-                    {
-                        $gte:lastYear 
-                    }
-                }
-            },
-            {
-                $project:
-                {
-                    month:
-                    {
-                        $month:"$createdAt"
-                    },
-                },
-            },
-            {
-                $group:
-                {
-                    _id:"$month",
-                    total:
-                    {
-                        $sum:1
-                    }
-                }
-            }
-        ])
-        res.status(200).json(data);
-    }catch(err){
-        res.status(500).json(err);
+router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
+    const date = new Date();
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+    try {
+      const data = await User.aggregate([
+        {
+          $match: { createdAt: { $gte: lastYear } },
+        },
+        {
+          $project: {
+            month: { $month: "$createdAt" },
+          },
+        },
+        {
+          $group: {
+            _id: "$month",
+            total: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { $id: -1 }, // Sort by _id in descending order
+        },
+      ]);
+      res.status(200).json(data);
+    } catch (err) {
+      res.status(500).json(err);
     }
-})
+  });
 
 module.exports = router

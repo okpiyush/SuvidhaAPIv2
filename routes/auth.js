@@ -4,12 +4,23 @@ const Otp=require("../models/Otp")
 const CryptoJS=require("crypto-js")
 const jwt=require("jsonwebtoken")
 const nodemailer=require("nodemailer")
+const Wishlist=require("../models/Wishlist");;
 //auth
 
 
 //register
+//adding creation of wishlist and adding it to the user req
 router.post("/register",async (req,res)=>{
-    const {username,email}=req.body;
+    console.log(req.body);
+    const {username,email,img}=req.body;
+    if(User.findOne({"username":username})){
+        res.status(500).json("User Exists");
+        return;
+    }else if(User.findOne({"email":email})){
+        res.status(500).json("Email exists");
+        return;
+    }
+    const wish=await new Wishlist().save();
     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if(!email.match(validRegex)){ 
         res.status(500).json("Wrong Email")
@@ -18,6 +29,8 @@ router.post("/register",async (req,res)=>{
     const newUser=User({
         username:username,
         email:email,
+        img:img,
+        wishlist:wish._id,
         password:CryptoJS.AES.encrypt(req.body.password,process.env.secretKey).toString(),
     });
     
@@ -50,8 +63,8 @@ router.post("/register",async (req,res)=>{
   };
 
     try{
-        
         const savedUser= await newUser.save();
+        console.log(savedUser);
         const {username,...others}=savedUser._doc;
         transporter.sendMail(MailOptions, function (error, info) {
             if (error) {
@@ -87,7 +100,7 @@ router.post("/login", async (req,res)=>{
     try{
         const user = await User.findOne({username:req.body.username});
         //first get the hashed password to decrpyt then convert it into utf 8 format 
-        !user && res.status(401).json("Wrong Username");
+        !user && res.status(404).json("Username not found");
 
         var Opassword=CryptoJS.AES.decrypt(user.password,process.env.secretKey).toString(CryptoJS.enc.Utf8);
         if(Opassword!== req.body.password)
@@ -116,10 +129,13 @@ router.post("/login", async (req,res)=>{
 
 
 
+// Rendering would be handled by ReactJS.
+// Server Deployable.
+// Code Shipped.
+// Deployment part.
 
 
-
-
+// Frontend, API, Database
 
 
 
@@ -195,9 +211,9 @@ router.post("/forgotpassword",async(req,res)=>{
                         console.log('Email sent: ' + info.response);
                     }
                 });
-                res.send("okay");
+                res.status(200).json("okay");
             }else{
-                res.status(403).json("OTP for user already exists")
+                res.status(409).json("OTP Exists")
             }
         }else{
             res.status(404).json("No User Found");
@@ -262,16 +278,16 @@ router.post("/setotp", async (req,res)=>{
         if(timeDiffer>fiveMinuteMili){
             //deleting the otp and sending that it has expired
             await Otp.findOneAndDelete({"email":email});
-            res.send("OTP expired");
+            res.status(498).json("OTP expired");
         }else if (OTP.Count===0){
             //if otp has exhausted it's chances, delete the otp from the session and send the number of chances has exhausted
             await Otp.findOneAndDelete({"email":email});
-            res.send("Number of limits Exhausted");
+            res.status(429).json("Number of limits Exhausted");
         }else if(totp!==otp){
             //if the otp doesnt match decrease the number of chances
             OTP.Count-=1;
             await OTP.save();
-            res.send("OTP doesnt match");
+            res.status(405).json("OTP doesnt match");
         }else{
             //if the password matches the new password change the password for the user and thendelete the otp from the data base
             const newPass=generateP();
@@ -293,7 +309,7 @@ router.post("/setotp", async (req,res)=>{
                 <html>
                     <body>
                     <p>Dear ${User1.username},</p>
-                    <p>Your new Password for your Suvidha account is <strong>${newPass}</strong>.</p> 
+                    <p>Your new Password for your Suvidha account is <strong>${newPass}</strong></p> 
                     <p>Change this Password once you login to the website</p>
                     <p>Warm regards,</p>
                     <p>The Suvidha Team</p>

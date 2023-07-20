@@ -4,7 +4,7 @@ const {verifyTokenAndAuthorization, verifyTokenAndAdmin} =require("./verifyToken
 
 
 //CREATE and add new product 
-router.post("/",verifyTokenAndAuthorization,async (req,res)=>{
+router.post("/",verifyTokenAndAdmin,async (req,res)=>{
     const newProduct = new Product(req.body);
     try{
         const saved= await newProduct.save();
@@ -16,7 +16,7 @@ router.post("/",verifyTokenAndAuthorization,async (req,res)=>{
 
 
 //update Product
-router.put("/:id",verifyTokenAndAuthorization,async (req,res)=>{
+router.put("/:id",verifyTokenAndAdmin,async (req,res)=>{
     try{
         const updatedProduct=await Product.findByIdAndUpdate(
             req.params.id,
@@ -45,9 +45,9 @@ router.delete("/:id",verifyTokenAndAdmin,async(req,res)=>{
 
 
 // get a product and its details
-router.get("/find/:userid",verifyTokenAndAuthorization,async(req,res)=>{
+router.get("/find/:id",async(req,res)=>{
     try{
-        const Products = await Product.findOne({userId:req.params.userid});
+        const Products = await Product.findOne({"_id":req.params.id});
         res.status(200).json(Products);
     }catch(err){
         res.status(500).json(err);
@@ -59,6 +59,7 @@ router.get("/find/:userid",verifyTokenAndAuthorization,async(req,res)=>{
 router.get("/",async(req,res)=>{
     const qnew= req.query.new;
     const qcat=req.query.category;
+    const featured=req.query.featured;
     try{
         let products;
         //new gives us the new 5 products
@@ -72,7 +73,12 @@ router.get("/",async(req,res)=>{
                     $in:[qcat]
                 }
             });
-        }else{
+        }else if(featured){
+            //featured gives us the featured 8 products
+            products=await Product.find({
+                featured:featured
+            }).limit(8)
+        }else {
             products= await Product.find();
         }
         res.status(200).json(products);
@@ -123,4 +129,17 @@ router.get("/stats",verifyTokenAndAdmin,async(req,res)=>{
     }
 })
 
+//get all specific products
+router.get("/getcustom",verifyTokenAndAuthorization,async (req,res)=>{
+    const {getproduct}=req.body;
+    //finding multiple at once
+    const pro= await Product.find(
+        {
+            "_id":{
+                "$in":getproduct
+            }   
+        }     
+    )
+    res.send(pro);
+})
 module.exports = router

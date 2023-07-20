@@ -33,7 +33,7 @@ router.put("/:id",verifyTokenAndAdmin,async (req,res)=>{
 });
 
 
-//delete user
+//delete order
 router.delete("/:id",verifyTokenAndAdmin,async(req,res)=>{
     try{
         await Order.findByIdAndDelete(req.params.id);
@@ -45,11 +45,20 @@ router.delete("/:id",verifyTokenAndAdmin,async(req,res)=>{
 
 
 // get a Order and its details
-router.get("/find/:userid",verifyTokenAndAuthorization,async(req,res)=>{
+// verifyTokenAndAuthorization,
+router.get("/find/:id",async(req,res)=>{
     try{
-        const Orders = await Order.findOne({userId:req.params.userid});
+        const Orders = await Order.find({userId:req.params.id}).sort({createdAt:-1});
+        // const pro= await Product.find(
+        //     {
+        //         "_id":{
+        //             "$in":Orders.productid
+        //         }   
+        //     }     
+        // )
         res.status(200).json(Orders);
     }catch(err){
+        console.log(req.headers);
         res.status(500).json(err);
     }
 })
