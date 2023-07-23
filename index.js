@@ -67,31 +67,31 @@ const io= new Server(socketServer,{
 
 //listening to the calls io.on means someone connected to the webserver then execute this function
 
-io.on("connection",(socket)=>{
-    console.log(socket.id+" Connected");
-    //this is for the disconnection and is a callback function
+// io.on("connection",(socket)=>{
+//     console.log(socket.id+" Connected");
+//     //this is for the disconnection and is a callback function
 
-    socket.on("send_message", (data) => {   
-        console.log(data);
-        socket.to(data.room).emit("receive_message", data);
-    });
+//     socket.on("send_message", (data) => {   
+//         console.log(data);
+//         socket.to(data.room).emit("receive_message", data);
+//     });
 
-    socket.on("join_room",(data)=>{
-        socket.join(data);
-        console.log(`user with ${socket.id} entered the room ${data}`)
-    })
-    socket.on("disconnect",()=>{
-        console.log("User Disconnected", socket.id);
-    })
-})
+//     socket.on("join_room",(data)=>{
+//         socket.join(data);
+//         console.log(`user with ${socket.id} entered the room ${data}`)
+//     })
+//     socket.on("disconnect",()=>{
+//         console.log("User Disconnected", socket.id);
+//     })
+// })
 
 
 //starting both the servers
 server.listen(process.env.PORT||5000,()=>{
         console.log("Backend server is running on Port: "+process.env.PORT);
 });
-socketServer.listen(3002,()=>{
-    console.log("Socket.io server is running on port 3002");
-})
+// socketServer.listen(3002,()=>{
+//     console.log("Socket.io server is running on port 3002");
+// })
 
 module.export = app;

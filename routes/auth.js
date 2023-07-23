@@ -11,15 +11,7 @@ const Wishlist=require("../models/Wishlist");;
 //register
 //adding creation of wishlist and adding it to the user req
 router.post("/register",async (req,res)=>{
-    console.log(req.body);
     const {username,email,img}=req.body;
-    if(User.findOne({"username":username})){
-        res.status(500).json("User Exists");
-        return;
-    }else if(User.findOne({"email":email})){
-        res.status(500).json("Email exists");
-        return;
-    }
     const wish=await new Wishlist().save();
     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if(!email.match(validRegex)){ 
@@ -77,7 +69,11 @@ router.post("/register",async (req,res)=>{
         console.log("user saved")
         res.status(200).json({"username":username});
     }catch(E){
-        res.status(500).json(E);
+       if(E.keyValue.email){
+        res.status(500).json("Email already Exists");
+       }else if(E.keyValue.username){
+        res.status(500).json("Username already Exists");
+       }
     }
 });
 
