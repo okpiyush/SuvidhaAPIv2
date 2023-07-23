@@ -77,8 +77,8 @@ router.post("/", async (req, res) => {
 
 
 //sending bulk mails
-router.post("/bulkmail",verifyTokenAndAdmin,async(req,res)=>{
-    const {email,subject,text}=req.body;
+router.post("/bulkmail",async(req,res)=>{
+    const {name,desig,subject,body}=req.body;
     const emails=await Mail.find();
    
     const emailsArray=await emails.map(email=>email.mail);
@@ -94,9 +94,16 @@ router.post("/bulkmail",verifyTokenAndAdmin,async(req,res)=>{
       to: process.env.email,
       bcc: emailsArray,
       subject:subject,
-      text:text 
-    };
-  
+      html:`
+      <div> Dear Subscriber,</div>
+      <p>${body}</p>
+      <p>Thank you for your attention.</p>
+      <p style="color:red">Please note that this is an automated email and we kindly request that you do not respond directly to this message.</p>
+      <div>${name},</div>
+      <div>${desig},</div>
+      <div>The Suvidha Team</div>
+    `
+  };
     try {
         transporter.sendMail(MailOptions, function (error, info) {
           if (error) {
@@ -106,7 +113,7 @@ router.post("/bulkmail",verifyTokenAndAdmin,async(req,res)=>{
              + info.response);
           }
         });
-        res.send(email);
+        res.send("Okay");
       }catch (err) {
       console.log(err);
     }
