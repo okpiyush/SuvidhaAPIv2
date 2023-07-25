@@ -93,7 +93,7 @@ router.get("/stats",verifyTokenAndAdmin,async(req,res)=>{
     const date=new Date();
     const lastYear=new Date(date.setFullYear(date.getFullYear()-1));
     try{
-        const data=await User.aggregate([
+        const data=await Product.aggregate([
             {
                 $match:
                 {
