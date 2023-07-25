@@ -95,6 +95,7 @@ router.post("/register",async (req,res)=>{
 
 router.post("/login", async (req,res)=>{
     try{
+        
         const user = await User.findOne({username:req.body.username});
         //first get the hashed password to decrpyt then convert it into utf 8 format 
         !user && res.status(404).json("Username not found");
@@ -113,10 +114,11 @@ router.post("/login", async (req,res)=>{
                 expiresIn:"3d"
             });
             const {password,...other}=user._doc;
+            
             if(user._doc.isAdmin){
                 try{
                 await new Log({
-                    Logs:`${req.socket.remoteAddress}`,
+                    Logs:`${req.headers.ip}`,
                 }).save();
                 }catch(err){
                     console.log("Log didnt happen");

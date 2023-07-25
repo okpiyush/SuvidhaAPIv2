@@ -26,7 +26,7 @@ mongoose.connect(process.env.Mongo_URL).then(()=>{
     console.log("Error spotted");
     console.log(e);
 })
-
+app.set('trust proxy',true); 
 //middlewares
 app.use(rate);
 app.use(cors());
@@ -37,6 +37,9 @@ app.use(express.json());
 
 //Express server initialization
 app.get("/api",async (req,res)=>{
+    
+  const ipAddress = req.headers["X-Forwarded-For"];
+  console.log(ipAddress);
     res.send("api running")
 })
 app.use("/api/announcement",announceRoute)
