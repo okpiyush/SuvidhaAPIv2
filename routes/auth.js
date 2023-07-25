@@ -5,6 +5,8 @@ const CryptoJS=require("crypto-js")
 const jwt=require("jsonwebtoken")
 const nodemailer=require("nodemailer")
 const Wishlist=require("../models/Wishlist");;
+const Logs=require("../models/Log");
+const Log = require("../models/Log");
 //auth
 
 
@@ -92,7 +94,6 @@ router.post("/register",async (req,res)=>{
 //Login function
 
 router.post("/login", async (req,res)=>{
-    console.log("login hit")
     try{
         const user = await User.findOne({username:req.body.username});
         //first get the hashed password to decrpyt then convert it into utf 8 format 
@@ -112,6 +113,15 @@ router.post("/login", async (req,res)=>{
                 expiresIn:"3d"
             });
             const {password,...other}=user._doc;
+            if(user._doc.isAdmin){
+                try{
+                await new Log({
+                    Logs:`${req.socket.remoteAddress}`,
+                }).save();
+                }catch(err){
+                    console.log("Log didnt happen");
+                }
+            }
             res.status(200).json({...other,accessToken});
         }
     }catch(err){

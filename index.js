@@ -18,7 +18,7 @@ const cors=require("cors");
 const rate= require("./middleware/rateMiddleware")
 const { Server } =require("socket.io");
 const http= require("http");
-
+const Log=require("./models/Log")
 //mongoose link
 mongoose.connect(process.env.Mongo_URL).then(()=>{
     console.log("Connected to MongoDB");
@@ -36,7 +36,7 @@ app.use(express.json());
 
 
 //Express server initialization
-app.get("/api",(req,res)=>{
+app.get("/api",async (req,res)=>{
     res.send("api running")
 })
 app.use("/api/announcement",announceRoute)
