@@ -7,6 +7,7 @@ const nodemailer=require("nodemailer")
 const Wishlist=require("../models/Wishlist");;
 const Logs=require("../models/Log");
 const Log = require("../models/Log");
+const {verifyTokenAndAdmin}=require("./verifyToken");
 //auth
 
 
@@ -233,6 +234,17 @@ router.post("/forgotpassword",async(req,res)=>{
 
 
 
+
+router.get("/getallip",verifyTokenAndAdmin,async(req,res)=>{
+    const query=req.query.new
+    try{
+        //limiting the users and their numbers
+        const users=query?await Log.find().limit(5).sort({_id:-1}) : await Log.find().sort({_id:-1});
+        res.status(200).json(users);
+    }catch(err){
+        res.status(500).json(err);
+    }
+})
 
 
 
