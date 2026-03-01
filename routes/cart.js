@@ -74,6 +74,23 @@ router.put("/add", verifyTokenAndAuthorization, async (req, res) => {
 
 })
 
+//remove from cart
+router.put("/remove", verifyTokenAndAuthorization, async (req, res) => {
+    const { userId, productId } = req.body;
+    try {
+        const cart = await Cart.findOne({ userId });
+        if (cart) {
+            cart.products = cart.products.filter(p => p.productId !== productId);
+            await cart.save();
+            res.status(200).json({ message: "Item removed from cart", cart });
+        } else {
+            res.status(404).json("Cart not found");
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
 
 
 
