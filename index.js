@@ -1,32 +1,32 @@
-const express=require("express");
-const app=express();
+const express = require("express");
+const app = express();
 const mongoose = require('mongoose');
-const dotenv=require("dotenv");
+const dotenv = require("dotenv");
 dotenv.config();
-const userRoute=require("./routes/user")
-const authRoute=require("./routes/auth")
-const cartRoute=require("./routes/cart")
-const productRoute=require("./routes/product")
-const orderRoute=require("./routes/order")
-const paymentRoute=require("./routes/stripe")
-const announceRoute=require("./routes/announcement");
-const mailerRute=require("./routes/mailer")
-const SlideshowRoute=require("./routes/slideshow");
-const MlLogicCalls=require("./routes/mllogicCalls");
-const Wishlist=require("./routes/wishlist")
-const cors=require("cors");
-const rate= require("./middleware/rateMiddleware")
-const { Server } =require("socket.io");
-const http= require("http");
-const Log=require("./models/Log")
+const userRoute = require("./routes/user")
+const authRoute = require("./routes/auth")
+const cartRoute = require("./routes/cart")
+const productRoute = require("./routes/product")
+const orderRoute = require("./routes/order")
+const paymentRoute = require("./routes/stripe")
+const announceRoute = require("./routes/announcement");
+const mailerRute = require("./routes/mailer")
+const SlideshowRoute = require("./routes/slideshow");
+const MlLogicCalls = require("./routes/mllogicCalls");
+const Wishlist = require("./routes/wishlist")
+const cors = require("cors");
+const rate = require("./middleware/rateMiddleware")
+const { Server } = require("socket.io");
+const http = require("http");
+const Log = require("./models/Log")
 //mongoose link
-mongoose.connect(process.env.Mongo_URL).then(()=>{
+mongoose.connect(process.env.Mongo_URL).then(() => {
     console.log("Connected to MongoDB");
-}).catch((e)=>{
+}).catch((e) => {
     console.log("Error spotted");
     console.log(e);
 })
-app.set('trust proxy',true); 
+app.set('trust proxy', true);
 //middlewares
 app.use(rate);
 app.use(cors());
@@ -36,35 +36,35 @@ app.use(express.json());
 
 
 //Express server initialization
-app.get("/api",async (req,res)=>{
-    
-  const ipAddress = req.headers["X-Forwarded-For"];
-  console.log(ipAddress);
+app.get("/api", async (req, res) => {
+
+    const ipAddress = req.headers["X-Forwarded-For"];
+    console.log(ipAddress);
     res.send("api running")
 })
-app.use("/api/announcement",announceRoute)
-app.use("/api/users",userRoute);
-app.use("/api/auth",authRoute);
-app.use("/api/cart",cartRoute)
-app.use("/api/products",productRoute);
-app.use("/api/order",orderRoute);
-app.use("/api/checkout/",paymentRoute);
-app.use("/api/mail",mailerRute)
-app.use("/api/slideshow",SlideshowRoute)
-app.use("/api/find",MlLogicCalls);
-app.use("/api/wishlist",Wishlist);
-const server=http.createServer(app);
+app.use("/api/announcement", announceRoute)
+app.use("/api/users", userRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/cart", cartRoute)
+app.use("/api/products", productRoute);
+app.use("/api/order", orderRoute);
+app.use("/api/checkout/", paymentRoute);
+app.use("/api/mail", mailerRute)
+app.use("/api/slideshow", SlideshowRoute)
+app.use("/api/find", MlLogicCalls);
+app.use("/api/wishlist", Wishlist);
+const server = http.createServer(app);
 // app.listen(process.env.PORT||5000,()=>{
 
 //     console.log("Backend server is running on Port: "+process.env.PORT);
 // });
 
 //making the socket server 
-const socketServer=http.createServer();
-const io= new Server(socketServer,{
-    cors:{
-        origin :["http://localhost:3000","http://localhost:3001"],
-        methods :["GET","POST"]
+const socketServer = http.createServer();
+const io = new Server(socketServer, {
+    cors: {
+        origin: ["http://localhost:3000", "http://localhost:3001"],
+        methods: ["GET", "POST"]
     }
 })
 
@@ -90,8 +90,8 @@ const io= new Server(socketServer,{
 
 
 //starting both the servers
-server.listen(process.env.PORT||5000,()=>{
-        console.log("Backend server is running on Port: "+process.env.PORT);
+server.listen(process.env.PORT || 5001, () => {
+    console.log("Backend server is running on Port: " + process.env.PORT);
 });
 // socketServer.listen(3002,()=>{
 //     console.log("Socket.io server is running on port 3002");
